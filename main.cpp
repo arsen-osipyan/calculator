@@ -1,43 +1,32 @@
 ﻿/* TODO:
- * 1. Глава 7 (calculator08buggy пофиксить)
- * 2. Упражнения в конце главе с 1 по 9
- * 3. Поделить на файлы
- * 4. Тесты написать минимум 50
+ * 1. Глава 7 (calculator08buggy пофиксить) | +
+ * 2. Упражнения в конце главе с 1 по 9     |
+ * 3. Поделить на файлы                     | +
+ * 4. Тесты написать минимум 50             |
  */
 
-/* Что сделать с файлами:
- * token.h (содержит описание классов и функций и константы)
- * token.cpp (содержит реализацию классов и функций)
- *   - Лексемы
- *   - Поток ввода
- *   - Константы (ключевые слова)
- * variable.h (объявить через extern переменные и таблици символов)
- * variable.cpp
- * calculator.cpp
- *
- * ifndef использовать
- */
 
-#include <std_lib_facilities.h>
 #include "token.h"
 #include "variable.h"
+#include <iostream>
+#include <string>
+#include <vector>
+
+
+double expression(TokenStream& ts);
 
 
 
-double expression(Token_stream& ts);
-
-
-
-double declaration(Token_stream& ts)
+double declaration(TokenStream& ts)
 {
   Token t = ts.get();
   if (t.kind != NAME)
-    error("declaration(): variable name required in initialization");
-  string var_name{ t.name };
+    throw std::runtime_error{"declaration(): variable name required in initialization"};
+  std::string var_name{ t.name };
 
   t = ts.get();
   if (t.kind != '=')
-    error("declaration(): missed '=' in declaration ", var_name);
+    throw std::runtime_error{"declaration(): missed '=' in declaration"};
 
   double d{ expression(ts) };
   define_name(var_name, d);
@@ -45,7 +34,7 @@ double declaration(Token_stream& ts)
   return d;
 }
 
-double primary(Token_stream& ts)
+double primary(TokenStream& ts)
 {
   Token t = ts.get();
   switch (t.kind)
@@ -55,7 +44,7 @@ double primary(Token_stream& ts)
     double d = expression(ts);
     t = ts.get();
     if (t.kind != ')')
-      error("primary(): ')' expected");
+      throw std::runtime_error{"primary(): ')' expected"};
     return d;
   }
 
@@ -64,7 +53,7 @@ double primary(Token_stream& ts)
     double d = expression(ts);
     t = ts.get();
     if (t.kind != '}')
-      error("primary(): '}' expected");
+      throw std::runtime_error{"primary(): '}' expected"};
     return d;
   }
 
@@ -81,11 +70,11 @@ double primary(Token_stream& ts)
     return get_value(t.name);
 
   default:
-    error("primary(): primary expected");
+    throw std::runtime_error{"primary(): primary expected"};
   }
 }
 
-double term(Token_stream& ts)
+double term(TokenStream& ts)
 {
   double left = primary(ts);
   Token t = ts.get();
@@ -104,7 +93,7 @@ double term(Token_stream& ts)
     case '/':
     {
       double d = primary(ts);
-      if (d == 0) error("term(): divide by zero");
+      if (d == 0) throw std::runtime_error{"term(): divide by zero"};
       left /= d;
       t = ts.get();
       break;
@@ -113,8 +102,8 @@ double term(Token_stream& ts)
     case '%':
     {
       double d = primary(ts);
-      if (d == 0) error("term(): divide by zero");
-      left = fmod(left, d);
+      if (d == 0) throw std::runtime_error{"term(): divide by zero"};
+      left -= int(left / d) * d;
       t = ts.get();
       break;
     }
@@ -128,7 +117,7 @@ double term(Token_stream& ts)
   }
 }
 
-double expression(Token_stream& ts)
+double expression(TokenStream& ts)
 {
   double left = term(ts);
   Token t = ts.get();
@@ -160,7 +149,7 @@ double expression(Token_stream& ts)
   }
 }
 
-double statement(Token_stream& ts)
+double statement(TokenStream& ts)
 {
   Token t = ts.get();
 
@@ -196,25 +185,25 @@ double statement(Token_stream& ts)
 
 void calculate()
 {
-  Token_stream ts;
+  TokenStream ts;
   try
   {
-    while (cin)
+    while (std::cin)
     {
-      cout << PROMPT;
+      std::cout << PROMPT;
       Token t = ts.get();
 
       while (t.kind == PRINT) t = ts.get();
       if (t.kind == QUIT) return;
 
       ts.putback(t);
-      cout << RESULT << statement(ts) << '\n';
+      std::cout << RESULT << statement(ts) << '\n';
     }
 
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
-    cout << e.what() << '\n';
+    std::cout << e.what() << '\n';
     ts.ignore(PRINT);
   }
 }
@@ -229,19 +218,26 @@ int main()
 
     calculate();
 
-    // keep_window_open();
     return 0;
   }
-  catch (exception& e)
+  catch (TokenError& e)
   {
-    cerr << e.what() <<'\n';
-    // keep_window_open(ERROR_EXIT);
+    std::cerr << "TokenError: " << e.what << '\n';
+    return 1;
+  }
+  catch (VariableError& e)
+  {
+    std::cerr << "VariableError: " << e.what << '\n';
+    return 1;
+  }
+  catch (std::exception& e)
+  {
+    std::cerr << e.what() <<'\n';
     return 1;
   }
   catch (...)
   {
-    cerr << "Oops: unknown exception!\n";
-    // keep_window_open(ERROR_EXIT);
+    std::cerr << "Oops: unknown exception!\n";
     return 2;
   }
 }
