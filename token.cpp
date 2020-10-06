@@ -21,7 +21,6 @@ Token TokenStream::get()
     case PRINT:
     case QUIT:
     case NAME:
-    case LET:
     case INIT:
     case '(': case ')':
     case '{': case '}':

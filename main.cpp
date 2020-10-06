@@ -145,37 +145,38 @@ double statement(TokenStream& ts)
 
   switch (t.kind)
   {
-  case LET:
-    return declaration(ts);
+    case LET:
+      return declaration(ts);
 
-  case NAME:
-  {
-    Token t1 = ts.get();
-    if (t1.kind == '=')
+    case NAME:
     {
-      double d{ primary(ts) };
-      ts.putback(t1);
-      ts.putback(t);
-      set_value(t.name, d);
-      return set_value(t.name, d);
+      Token t1 = ts.get();
+      if (t1.kind == '=')
+      {
+        double d{ primary(ts) };
+        ts.putback(t1);
+        ts.putback(t);
+        set_value(t.name, d);
+        return set_value(t.name, d);
+      }
+      else
+      {
+        ts.putback(t1);
+        ts.putback(t);
+        return primary(ts);
+      }
     }
-    else
-    {
-      ts.putback(t1);
+
+    default:
       ts.putback(t);
       return expression(ts);
-    }
-  }
-
-  default:
-    ts.putback(t);
-    return expression(ts);
   }
 }
 
 void calculate()
 {
   TokenStream ts;
+
   try
   {
     while (std::cin)
