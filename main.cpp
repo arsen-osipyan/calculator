@@ -1,12 +1,4 @@
-﻿/* TODO:
- * 1. Глава 7 (calculator08buggy пофиксить) | +
- * 2. Упражнения в конце главе с 1 по 9     |
- * 3. Поделить на файлы                     | +
- * 4. Тесты написать минимум 50             |
- */
-
-
-#include "token.h"
+﻿#include "token.h"
 #include "variable.h"
 #include <iostream>
 #include <string>
@@ -14,8 +6,6 @@
 
 
 double expression(TokenStream& ts);
-
-
 
 double declaration(TokenStream& ts)
 {

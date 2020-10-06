@@ -1,8 +1,10 @@
 ﻿#ifndef TOKEN_H
 #define TOKEN_H
 
+
 #include <string>
 #include <vector>
+
 
 const char NUMBER{ '8' };        // For numbers
 const char QUIT{ 'q' };          // For quit

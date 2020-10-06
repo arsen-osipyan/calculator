@@ -26,7 +26,9 @@ class VariableError
       : what{ str } { }
 };
 
+
 extern std::vector<Variable> var_table;
+
 
 double get_value(std::string s);
 bool is_declared(std::string var);

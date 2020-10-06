@@ -5,6 +5,7 @@
 
 std::vector<Variable> var_table{ };
 
+
 double get_value(std::string s)
 {
   for (const Variable& v : var_table)
