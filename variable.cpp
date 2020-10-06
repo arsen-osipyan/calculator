@@ -22,14 +22,18 @@ bool is_declared(std::string var)
 
 double define_name(std::string var, double val)
 {
-  if (is_declared((var))) throw VariableError("variable is already defined");
+  if (is_declared((var)))
+    throw VariableError("variable is already defined");
   var_table.push_back(Variable(var, val));
   return val;
 }
 
 double set_value(std::string var, double val)
 {
-  if (!is_declared(var)) throw VariableError("variable is not defined");
-  for (size_t i{0}; i < var_table.size(); ++i) if (var_table[i].name == var) var_table[i].value = val;
+  if (!is_declared(var))
+    throw VariableError("variable is not defined");
+  for (size_t i{0}; i < var_table.size(); ++i)
+    if (var_table[i].name == var)
+      var_table[i].value = val;
   return val;
 }

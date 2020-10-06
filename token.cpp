@@ -19,6 +19,7 @@ Token TokenStream::get()
   switch (ch)
   {
     case PRINT:
+    case ALT_PRINT:
     case QUIT:
     case NAME:
     case INIT:
@@ -39,21 +40,21 @@ Token TokenStream::get()
       double val;
       std::cin >> val;         // Reading float number
       return Token{ NUMBER, val };
-  }
-
-  default:
-  {
-    if (isalpha(ch))           // Reading variable name or declaration key word
-    {
-      std::string s;
-      s += ch;
-      while (std::cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch;
-      std::cin.putback(ch);
-      if (s == DECLKEY) return Token{ LET };
-      return Token{ NAME, s };
     }
-    throw TokenError("bad token");
-  }
+
+    default:
+    {
+      if (isalpha(ch) || ch == '_')           // Reading variable name or declaration key word
+      {
+        std::string s;
+        s += ch;
+        while (std::cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch;
+        std::cin.putback(ch);
+        if (s == DECLKEY) return Token{ LET };
+        return Token{ NAME, s };
+      }
+      throw TokenError("bad token");
+    }
   }
 }
 

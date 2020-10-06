@@ -151,12 +151,9 @@ double statement(TokenStream& ts)
     case NAME:
     {
       Token t1 = ts.get();
-      if (t1.kind == '=')
+      if (t1.kind == INIT)
       {
         double d{ primary(ts) };
-        ts.putback(t1);
-        ts.putback(t);
-        set_value(t.name, d);
         return set_value(t.name, d);
       }
       else
@@ -184,13 +181,12 @@ void calculate()
       std::cout << PROMPT;
       Token t = ts.get();
 
-      while (t.kind == PRINT) t = ts.get();
+      while (t.kind == PRINT || t.kind == ALT_PRINT) t = ts.get();
       if (t.kind == QUIT) return;
 
       ts.putback(t);
       std::cout << RESULT << statement(ts) << '\n';
     }
-
   }
   catch (std::exception& e)
   {
@@ -223,12 +219,12 @@ int main()
   }
   catch (std::exception& e)
   {
-    std::cerr << e.what() <<'\n';
+    std::cerr << "RunTimeError: " << e.what() <<'\n';
     return 1;
   }
   catch (...)
   {
-    std::cerr << "Oops: unknown exception!\n";
+    std::cerr << "Something went wrong.\n";
     return 2;
   }
 }
