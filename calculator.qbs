@@ -5,6 +5,10 @@ CppApplication {
     files: [
         ".gitignore",
         "main.cpp",
+        "token.cpp",
+        "token.h",
+        "variable.cpp",
+        "variable.h",
     ]
 
     Group {     // Properties for the produced executable
