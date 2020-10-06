@@ -27,40 +27,50 @@ double declaration(TokenStream& ts)
 double primary(TokenStream& ts)
 {
   Token t = ts.get();
+
   switch (t.kind)
   {
-  case '(':
-  {
-    double d = expression(ts);
-    t = ts.get();
-    if (t.kind != ')')
-      throw std::runtime_error{"primary(): ')' expected"};
-    return d;
-  }
+    case '(':
+    {
+      double d = expression(ts);
+      t = ts.get();
+      if (t.kind != ')')
+        throw std::runtime_error{"primary(): ')' expected"};
+      return d;
+    }
 
-  case '{':
-  {
-    double d = expression(ts);
-    t = ts.get();
-    if (t.kind != '}')
-      throw std::runtime_error{"primary(): '}' expected"};
-    return d;
-  }
+    case '{':
+    {
+      double d = expression(ts);
+      t = ts.get();
+      if (t.kind != '}')
+        throw std::runtime_error{"primary(): '}' expected"};
+      return d;
+    }
 
-  case NUMBER:
-    return t.value;
+    case '[':
+    {
+      double d = expression(ts);
+      t = ts.get();
+      if (t.kind != ']')
+        throw std::runtime_error{"primary(): ']' expected"};
+      return d;
+    }
 
-  case '-':
-    return -primary(ts);
+    case NUMBER:
+      return t.value;
 
-  case '+':
-    return primary(ts);
+    case '-':
+      return -primary(ts);
 
-  case 'a':
-    return get_value(t.name);
+    case '+':
+      return primary(ts);
 
-  default:
-    throw std::runtime_error{"primary(): primary expected"};
+    case NAME:
+      return get_value(t.name);
+
+    default:
+      throw std::runtime_error{"primary(): primary expected"};
   }
 }
 
@@ -73,36 +83,36 @@ double term(TokenStream& ts)
   {
     switch (t.kind)
     {
-    case '*':
-    {
-      left *= primary(ts);
-      t = ts.get();
-      break;
-    }
+      case '*':
+      {
+        left *= primary(ts);
+        t = ts.get();
+        break;
+      }
 
-    case '/':
-    {
-      double d = primary(ts);
-      if (d == 0) throw std::runtime_error{"term(): divide by zero"};
-      left /= d;
-      t = ts.get();
-      break;
-    }
+      case '/':
+      {
+        double d = primary(ts);
+        if (d == 0) throw std::runtime_error{"term(): divide by zero"};
+        left /= d;
+        t = ts.get();
+        break;
+      }
 
-    case '%':
-    {
-      double d = primary(ts);
-      if (d == 0) throw std::runtime_error{"term(): divide by zero"};
-      left -= int(left / d) * d;
-      t = ts.get();
-      break;
-    }
+      case '%':
+      {
+        double d = primary(ts);
+        if (d == 0) throw std::runtime_error{"term(): divide by zero"};
+        left -= int(left / d) * d;
+        t = ts.get();
+        break;
+      }
 
-    default:
-    {
-      ts.putback(t);
-      return left;
-    }
+      default:
+      {
+        ts.putback(t);
+        return left;
+      }
     }
   }
 }
@@ -116,25 +126,25 @@ double expression(TokenStream& ts)
   {
     switch (t.kind)
     {
-    case '+':
-    {
-      left += term(ts);
-      t = ts.get();
-      break;
-    }
+      case '+':
+      {
+        left += term(ts);
+        t = ts.get();
+        break;
+      }
 
-    case '-':
-    {
-      left -= term(ts);
-      t = ts.get();
-      break;
-    }
+      case '-':
+      {
+        left -= term(ts);
+        t = ts.get();
+        break;
+      }
 
-    default:
-    {
-      ts.putback(t);
-      return left;
-    }
+      default:
+      {
+        ts.putback(t);
+        return left;
+      }
     }
   }
 }
@@ -160,7 +170,7 @@ double statement(TokenStream& ts)
       {
         ts.putback(t1);
         ts.putback(t);
-        return primary(ts);
+        return expression(ts);
       }
     }
 
@@ -181,7 +191,7 @@ void calculate()
       std::cout << PROMPT;
       Token t = ts.get();
 
-      while (t.kind == PRINT || t.kind == ALT_PRINT) t = ts.get();
+      while (t.kind == PRINT) t = ts.get();
       if (t.kind == QUIT) return;
 
       ts.putback(t);

@@ -19,7 +19,6 @@ Token TokenStream::get()
   switch (ch)
   {
     case PRINT:
-    case ALT_PRINT:
     case QUIT:
     case NAME:
     case INIT:

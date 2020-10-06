@@ -9,7 +9,6 @@
 const char NUMBER{ '8' };             // For numbers
 const char QUIT{ 'q' };               // For quit
 const char PRINT{ ';' };              // For print
-const char ALT_PRINT{ '\n' };         // For print
 const char NAME{ 'a' };               // For variable name
 const char LET{ 'l' };                // For DECLKEY word
 const char INIT{ '=' };               // For variable initialization
