@@ -2,7 +2,10 @@ import qbs
 
 CppApplication {
     consoleApplication: true
-    files: "main.cpp"
+    files: [
+        ".gitignore",
+        "main.cpp",
+    ]
 
     Group {     // Properties for the produced executable
         fileTagsFilter: "application"
