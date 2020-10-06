@@ -4,7 +4,6 @@
 #include <vector>
 
 
-
 Token Token_stream::get()
 {
   if (!buffer.empty())               /// If buffer is full
