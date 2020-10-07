@@ -149,6 +149,7 @@ double expression(TokenStream& ts)
   }
 }
 
+// add handling QUIT, PRINT
 double statement(TokenStream& ts)
 {
   Token t = ts.get();
@@ -194,10 +195,10 @@ void calculate()
       std::cout << PROMPT;
       Token t = ts.get();
 
-      while (t.kind == PRINT) t = ts.get();
-      if (t.kind == QUIT) return;
-
-      ts.putback(t);
+      // while (t.kind == PRINT) t = ts.get();
+      // if (t.kind == QUIT) return;
+      //
+      // ts.putback(t);
       std::cout << RESULT << statement(ts) << '\n';
     }
   }
