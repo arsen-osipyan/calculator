@@ -50,6 +50,7 @@ Token TokenStream::get()
         while (std::cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch;
         std::cin.putback(ch);
         if (s == DECLKEY) return Token{ LET };
+        if (s == CONSTKEY) return Token{ CONST };
         return Token{ NAME, s };
       }
       throw TokenError("bad token");

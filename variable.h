@@ -11,9 +11,10 @@ class Variable
   public:
     std::string name;
     double value;
+    bool is_constant;
 
-    Variable(std::string n, double val)
-      : name{ n }, value{ val } { }
+    Variable(std::string n, double val, bool constant)
+      : name{ n }, value{ val }, is_constant{ constant } { }
 };
 
 class VariableError
@@ -32,7 +33,7 @@ extern std::vector<Variable> var_table;
 
 double get_value(std::string s);
 bool is_declared(std::string var);
-double define_name(std::string var, double val);
+double define_name(std::string var, double val, bool is_const);
 double set_value(std::string var, double val);
 
 

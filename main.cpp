@@ -7,7 +7,7 @@
 
 double expression(TokenStream& ts);
 
-double declaration(TokenStream& ts)
+double declaration(TokenStream& ts, bool is_const)
 {
   Token t = ts.get();
   if (t.kind != NAME)
@@ -19,7 +19,7 @@ double declaration(TokenStream& ts)
     throw std::runtime_error{"declaration(): missed '=' in declaration"};
 
   double d{ expression(ts) };
-  define_name(var_name, d);
+  define_name(var_name, d, is_const);
 
   return d;
 }
@@ -156,7 +156,10 @@ double statement(TokenStream& ts)
   switch (t.kind)
   {
     case LET:
-      return declaration(ts);
+      return declaration(ts, false);
+
+    case CONST:
+      return declaration(ts, true);
 
     case NAME:
     {
@@ -210,8 +213,8 @@ int main()
 {
   try
   {
-    define_name("pi", 3.1415926535);
-    define_name("e", 2.7182818284);
+    define_name("pi", 3.1415926535, true);
+    define_name("e", 2.7182818284, true);
 
     calculate();
 
