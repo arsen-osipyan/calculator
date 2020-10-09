@@ -5,13 +5,15 @@
 #include <vector>
 
 
+
 double expression(TokenStream& ts);
 
 double declaration(TokenStream& ts, bool is_const)
 {
   Token t = ts.get();
   if (t.kind != NAME)
-    throw std::runtime_error{"declaration(): variable name required in initialization"};
+    throw std::runtime_error{"declaration(): variable name required in " +
+                             "initialization"};
   std::string var_name{ t.name };
 
   t = ts.get();
