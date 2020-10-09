@@ -6,14 +6,16 @@
 
 
 
+struct ExitProgram { };
+
+
 double expression(TokenStream& ts);
 
 double declaration(TokenStream& ts, bool is_const)
 {
   Token t = ts.get();
   if (t.kind != NAME)
-    throw std::runtime_error{"declaration(): variable name required in " +
-                             "initialization"};
+    throw std::runtime_error{"declaration(): variable name required in initialization"};
   std::string var_name{ t.name };
 
   t = ts.get();
@@ -151,7 +153,6 @@ double expression(TokenStream& ts)
   }
 }
 
-// add handling QUIT, PRINT
 double statement(TokenStream& ts)
 {
   Token t = ts.get();
@@ -189,7 +190,6 @@ double statement(TokenStream& ts)
 void calculate()
 {
   TokenStream ts;
-
   try
   {
     while (std::cin)
@@ -197,10 +197,7 @@ void calculate()
       std::cout << PROMPT;
       Token t = ts.get();
 
-      // while (t.kind == PRINT) t = ts.get();
-      // if (t.kind == QUIT) return;
-      //
-      // ts.putback(t);
+      ts.putback(t);
       std::cout << RESULT << statement(ts) << '\n';
     }
   }
@@ -221,6 +218,10 @@ int main()
 
     calculate();
 
+    return 0;
+  }
+  catch (ExitProgram& e)
+  {
     return 0;
   }
   catch (TokenError& e)
