@@ -13,8 +13,11 @@ class Variable
     double value;
     bool is_constant;
 
-    Variable(std::string n, double val, bool constant)
-      : name{ n }, value{ val }, is_constant{ constant } { }
+    Variable(std::string s, double val, bool constant)
+      : name{ s }, value{ val }, is_constant{ constant } { }
+
+    Variable(std::string s, double val)
+      : name{ s }, value{ val }, is_constant{ false } { }
 };
 
 class VariableError
@@ -27,14 +30,21 @@ class VariableError
       : what{ str } { }
 };
 
+class SymbolTable
+{
+  private:
+    std::vector<Variable> var_table;
 
-extern std::vector<Variable> var_table;
+  public:
+    SymbolTable () = default;
 
+    double get(std::string s);
+    bool is_declared (std::string var);
+    double define (std::string var, double val, bool is_const);
+    double set (std::string var, double val);
+};
 
-double get_value(std::string s);
-bool is_declared(std::string var);
-double define_name(std::string var, double val, bool is_const);
-double set_value(std::string var, double val);
+extern SymbolTable var_scope;
 
 
 #endif // VARIABLE_H

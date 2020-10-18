@@ -1,0 +1,52 @@
+﻿Statement:
+  Expression
+  Quit
+  Print
+  Statement Expression
+
+Quit:
+  q
+
+Print:
+  ;
+
+Expression:
+  Computation
+  Declaration
+  Assignment
+
+Declaration:
+  "let" name "=" Calculation
+
+Assignment:
+  name "=" Calculation
+
+Computation:
+  Term
+  Computation "+" Term
+  Computation "-" Term
+
+Term:
+  Primary expression
+  Term "*" Primary expression
+  Term "/" Primary expression
+  Term "%" Primary expression
+
+Primary expression:
+  Number
+  Variable
+  "(" Expression ")"
+  "-" Primary expression
+  "+" Primary expression
+
+Variable:
+  Variable
+  Constant variable
+  Number
+
+Constant variable:
+  Constant variable
+  Number
+
+Number:
+  Float number

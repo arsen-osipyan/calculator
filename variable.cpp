@@ -3,10 +3,10 @@
 #include <vector>
 
 
-std::vector<Variable> var_table{ };
+SymbolTable var_scope;
 
 
-double get_value(std::string s)
+double SymbolTable::get (std::string s)
 {
   for (Variable& v : var_table)
     if (v.name == s) return v.value;
@@ -14,7 +14,7 @@ double get_value(std::string s)
   throw VariableError("undefined variable " + s);
 }
 
-bool is_declared(std::string var)
+bool SymbolTable::is_declared (std::string var)
 {
   for (Variable& v : var_table)
     if (v.name == var) return true;
@@ -22,7 +22,7 @@ bool is_declared(std::string var)
   return false;
 }
 
-double define_name(std::string var, double val, bool is_const)
+double SymbolTable::define (std::string var, double val, bool is_const)
 {
   if (is_declared((var)))
     throw VariableError("variable " + var + " is already defined");
@@ -31,7 +31,7 @@ double define_name(std::string var, double val, bool is_const)
   return val;
 }
 
-double set_value(std::string var, double val)
+double SymbolTable::set (std::string var, double val)
 {
   if (!is_declared(var))
     throw VariableError("variable " + var + " is not defined");

@@ -13,12 +13,20 @@ Token TokenStream::get()
     return tmp;
   }
 
+  std::cin >> std::noskipws;
   char ch;
-  std::cin >> ch;
+  while (true)
+  {
+    std::cin >> ch;
+    if (isspace(ch) && ch != '\n') continue;
+    else break;
+  }
+  std::cin >> std::skipws;
 
   switch (ch)
   {
     case PRINT:
+    case ALT_PRINT:
     case QUIT:
     case NAME:
     case INIT:

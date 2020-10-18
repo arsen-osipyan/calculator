@@ -197,7 +197,7 @@ void calculate()
     {
       std::cout << PROMPT;
       Token t = ts.get();
-
+      
       while (t.kind != ALT_PRINT)
       {
         while (t.kind == PRINT)
