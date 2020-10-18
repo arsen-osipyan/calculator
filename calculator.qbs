@@ -4,6 +4,7 @@ CppApplication {
     consoleApplication: true
     files: [
         ".gitignore",
+        "grammar.txt",
         "main.cpp",
         "token.cpp",
         "token.h",
