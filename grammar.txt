@@ -1,52 +1,36 @@
-﻿Statement:
-  Expression
-  Quit
-  Print
-  Statement Expression
+﻿Инструкция:
+  Выражение
+  Определение
+  Присваивание
 
-Quit:
-  q
+Определение:
+  "let" name "=" Выражение
 
-Print:
-  ;
+Присваивание:
+  name "=" Выражение
 
-Expression:
-  Computation
-  Declaration
-  Assignment
+Выражение:
+  Терм
+  Выражение "+" Терм
+  Выражение "-" Терм
 
-Declaration:
-  "let" name "=" Calculation
+Терм:
+  Первичное выражение
+  Терм "*" Первичное выражение
+  Терм "/" Первичное выражение
+  Терм "%" Первичное выражение
 
-Assignment:
-  name "=" Calculation
+Первичное выражение:
+  Число
+  Переменная / Константа
+  "(" Выражение ")"
+  "-" Первичное выражение
+  "+" Первичное выражение
 
-Computation:
-  Term
-  Computation "+" Term
-  Computation "-" Term
+Переменная / Константа:
+  Константа
+  Переменная
+  Число
 
-Term:
-  Primary expression
-  Term "*" Primary expression
-  Term "/" Primary expression
-  Term "%" Primary expression
-
-Primary expression:
-  Number
-  Variable
-  "(" Expression ")"
-  "-" Primary expression
-  "+" Primary expression
-
-Variable:
-  Variable
-  Constant variable
-  Number
-
-Constant variable:
-  Constant variable
-  Number
-
-Number:
-  Float number
+Число:
+  Число с плавающей точкой

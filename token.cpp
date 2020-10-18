@@ -13,31 +13,31 @@ Token TokenStream::get()
     return tmp;
   }
 
-  std::cin >> std::noskipws;
   char ch;
+  //std::cin >> std::noskipws;
   while (true)
   {
-    std::cin >> ch;
-    if (isspace(ch) && ch != '\n') continue;
-    else break;
+    std::cin.get(ch);
+    if (ch == '\n' || !isspace(ch)) break;
   }
-  std::cin >> std::skipws;
+  //std::cin >> std::skipws;
+
 
   switch (ch)
   {
     case PRINT:
-    case ALT_PRINT:
-    case QUIT:
     case NAME:
     case INIT:
     case '(': case ')':
     case '{': case '}':
+    case '[': case ']':
     case '%':
     case '+': case '-':
     case '*': case '/':
-    {
       return Token{ ch };      // Every symbol represents itself
-    }
+
+    case '\n':
+      return Token{ PRINT };
 
     case '.':                  // Float numbers
     case '0': case '1': case '2': case '3': case '4':
@@ -59,6 +59,8 @@ Token TokenStream::get()
         std::cin.putback(ch);
         if (s == DECLKEY) return Token{ LET };
         if (s == CONSTKEY) return Token{ CONST };
+        if (s == QUITKEY) return Token{ QUIT };
+        if (s == HELPKEY) return Token{ HELP };
         return Token{ NAME, s };
       }
       throw TokenError("bad token");

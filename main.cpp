@@ -5,14 +5,15 @@
 #include <vector>
 
 
-
-struct ExitProgram { };
-
-
 double expression(TokenStream& ts);
 
-double declaration(TokenStream& ts, bool is_const)
+double declaration(TokenStream& ts)
 {
+  Token kw = ts.get();
+  bool is_const{};
+  if (kw.kind == CONST) is_const = true;
+  else if (kw.kind == LET) is_const = false;
+
   Token t = ts.get();
   if (t.kind != NAME)
     throw std::runtime_error{"declaration(): variable name required in initialization"};
@@ -64,14 +65,14 @@ double primary(TokenStream& ts)
     case NUMBER:
       return t.value;
 
+    case NAME:
+      return var_scope.get(t.name);
+
     case '-':
       return -primary(ts);
 
     case '+':
       return primary(ts);
-
-    case NAME:
-      return var_scope.get(t.name);
 
     default:
       throw std::runtime_error{"primary(): primary expected"};
@@ -160,17 +161,16 @@ double statement(TokenStream& ts)
   switch (t.kind)
   {
     case LET:
-      return declaration(ts, false);
-
     case CONST:
-      return declaration(ts, true);
+      ts.putback(t);
+      return declaration(ts);
 
     case NAME:
     {
       Token t1 = ts.get();
       if (t1.kind == INIT)
       {
-        double d{ primary(ts) };
+        double d{ expression(ts) };
         return var_scope.set(t.name, d);
       }
       else
@@ -191,28 +191,31 @@ void calculate()
 {
   TokenStream ts;
 
-  try
+  while (std::cin)
   {
-    while (std::cin)
+    try
     {
-      std::cout << PROMPT;
       Token t = ts.get();
 
-      while (t.kind != ALT_PRINT)
-      {
-        while (t.kind == PRINT)
-          t = ts.get();
-        if (t.kind == QUIT) return;
+      while (t.kind == PRINT)
+        t = ts.get();
 
-        ts.putback(t);
-        std::cout << RESULT << statement(ts) << std::endl;
+      if (t.kind == HELP)
+      {
+        std::cout << RESULT << "I <3 U" << std::endl;
+        continue;
       }
+
+      if (t.kind == QUIT) return;
+
+      ts.putback(t);
+      std::cout << RESULT << statement(ts) << std::endl;
     }
-  }
-  catch (std::exception& e)
-  {
-    std::cout << e.what() << '\n';
-    ts.ignore(PRINT);
+    catch (std::runtime_error& e)
+    {
+      std::cerr << e.what() << std::endl;
+      ts.ignore(PRINT);
+    }
   }
 }
 
@@ -226,10 +229,6 @@ int main()
 
     calculate();
 
-    return 0;
-  }
-  catch (ExitProgram& e)
-  {
     return 0;
   }
   catch (TokenError& e)

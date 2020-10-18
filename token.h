@@ -6,19 +6,21 @@
 #include <vector>
 
 
-const char NUMBER{ '8' };                // For numbers
-const char QUIT{ 'q' };                  // For quit
-const char PRINT{ ';' };                 // For print
-const char ALT_PRINT{ '\n' };            //     and alternative print
-const char NAME{ 'a' };                  // For variable name
-const char LET{ 'l' };                   // For DECLKEY keyword
-const char CONST{ 'c' };                 // For CONSTKEY keyword
-const char INIT{ '=' };                  // For variable initialization
+constexpr char NUMBER{ '8' };            // For numbers
+constexpr char QUIT{ 'q' };              // For quit
+constexpr char PRINT{ ';' };             // For print
+constexpr char HELP{ 'h' };              // For help
+constexpr char NAME{ 'a' };              // For variable name
+constexpr char LET{ 'l' };               // For DECLKEY keyword
+constexpr char CONST{ 'c' };             // For CONSTKEY keyword
+constexpr char INIT{ '=' };              // For variable initialization
+
 const std::string PROMPT{ "> " };        // String before inputing statement
 const std::string RESULT{ "= " };        // String before printing result
-const std::string ERROR_EXIT{ "~~" };    // String to exit from console when error
-const std::string DECLKEY{ "let" };      // Key word for variable declaration
-const std::string CONSTKEY{ "const" };   // Key word for constant declaration
+const std::string DECLKEY{ "let" };      // For variable declaration
+const std::string CONSTKEY{ "const" };   // For constant declaration
+const std::string HELPKEY{ "help" };     // For get help
+const std::string QUITKEY{ "quit" };     // For quit
 
 
 class Token
