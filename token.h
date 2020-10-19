@@ -13,12 +13,14 @@ constexpr char HELP{ 'h' };              // For help
 constexpr char NAME{ 'a' };              // For variable name
 constexpr char LET{ 'l' };               // For DECLKEY keyword
 constexpr char CONST{ 'c' };             // For CONSTKEY keyword
+constexpr char FUNC{ 'f' };              // For FUNCKEY keyword
 constexpr char INIT{ '=' };              // For variable initialization
 
 const std::string PROMPT{ "> " };        // String before inputing statement
 const std::string RESULT{ "= " };        // String before printing result
 const std::string DECLKEY{ "let" };      // For variable declaration
 const std::string CONSTKEY{ "const" };   // For constant declaration
+const std::string FUNCKEY{ "func" };     // For function declaration
 const std::string HELPKEY{ "help" };     // For get help
 const std::string QUITKEY{ "quit" };     // For quit
 
@@ -48,6 +50,7 @@ class TokenStream
     Token get();
     void putback(Token t);
     void ignore(char c);
+    void clean();
 
     TokenStream()
       : buffer{ } { }

@@ -6,7 +6,7 @@
 
 Token TokenStream::get()
 {
-  if (!buffer.empty())         // getting tokens from buffer before getting from console input
+  if (!buffer.empty())         // get tokens from buffer before getting from console input
   {
     Token tmp{ buffer[buffer.size()-1] };
     buffer.pop_back();
@@ -31,31 +31,32 @@ Token TokenStream::get()
     case '%':
     case '+': case '-':
     case '*': case '/':
-      return Token{ ch };      // Every symbol represents itself
+      return Token{ ch };      // every symbol represents itself
 
-    case '\n':
+    case '\n':                 // '\n' used for print too
       return Token{ PRINT };
 
-    case '.':                  // Float numbers
+    case '.':                  // float numbers
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
     {
-      std::cin.putback(ch);    // First digit returns to input stream
+      std::cin.putback(ch);    // first digit returns to input stream
       double val;
-      std::cin >> val;         // Reading float number
+      std::cin >> val;         // reading float number
       return Token{ NUMBER, val };
     }
 
     default:
     {
-      if (isalpha(ch) || ch == '_')           // Reading variable name or declaration key word
+      if (isalpha(ch) || ch == '_' || ch == '$')           // reading variable name or declaration key word
       {
         std::string s;
         s += ch;
-        while (std::cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch;
+        while (std::cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_' || ch == '$')) s += ch;
         std::cin.putback(ch);
         if (s == DECLKEY) return Token{ LET };
         if (s == CONSTKEY) return Token{ CONST };
+        if (s == FUNCKEY) return Token{ FUNC };
         if (s == QUITKEY) return Token{ QUIT };
         if (s == HELPKEY) return Token{ HELP };
         return Token{ NAME, s };
@@ -81,4 +82,9 @@ void TokenStream::ignore(char token_kind)
       return;
     }
   }
+}
+
+void TokenStream::clean ()
+{
+  buffer.clear();
 }

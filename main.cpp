@@ -60,7 +60,6 @@
  */
 
 
-
 #include "token.h"
 #include "variable.h"
 #include <iostream>
@@ -70,9 +69,10 @@
 
 double expression(TokenStream& ts);
 
-double declaration(TokenStream& ts)
+double declaration(TokenStream& ts) // add function handling in this function
 {
   Token kw = ts.get();
+
   bool is_const{};
   if (kw.kind == CONST) is_const = true;
   else if (kw.kind == LET) is_const = false;
@@ -225,6 +225,7 @@ double statement(TokenStream& ts)
   {
     case LET:
     case CONST:
+    case FUNC:
       ts.putback(t);
       return declaration(ts);
 
@@ -253,11 +254,13 @@ double statement(TokenStream& ts)
 void calculate()
 {
   TokenStream ts;
+  std::cout.precision(15);
 
   while (std::cin)
   {
     try
     {
+      std::cout << PROMPT;
       Token t = ts.get();
 
       while (t.kind == PRINT)
@@ -274,10 +277,20 @@ void calculate()
       ts.putback(t);
       std::cout << RESULT << statement(ts) << std::endl;
     }
+    catch (TokenError& e)
+    {
+      std::cerr << e.what << std::endl;
+      ts.clean();
+    }
+    catch (VariableError& e)
+    {
+      std::cerr << e.what << std::endl;
+      ts.clean();
+    }
     catch (std::runtime_error& e)
     {
       std::cerr << e.what() << std::endl;
-      ts.ignore(PRINT);
+      ts.clean();
     }
   }
 }
