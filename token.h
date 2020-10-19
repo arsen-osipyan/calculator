@@ -30,7 +30,6 @@ class Token
     double value;
     std::string name;
 
-    // Initialize kind
     Token(char ch)
       : kind{ ch } { }
 
@@ -50,12 +49,11 @@ class TokenStream
     void putback(Token t);
     void ignore(char c);
 
-    // Initialize with zero buffer
     TokenStream()
       : buffer{ } { }
 
   private:
-    std::vector<Token> buffer; // uppdate buffer to be vector<Token>
+    std::vector<Token> buffer;
 };
 
 class TokenError

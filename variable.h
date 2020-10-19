@@ -15,9 +15,6 @@ class Variable
 
     Variable(std::string s, double val, bool constant)
       : name{ s }, value{ val }, is_constant{ constant } { }
-
-    Variable(std::string s, double val)
-      : name{ s }, value{ val }, is_constant{ false } { }
 };
 
 class VariableError
