@@ -1,66 +1,4 @@
-﻿/* Калькулятор
- *
- * Ввод - cin, вывод - cout.
- *
- * Грамматика для ввода:
- *
- *   Вычисление:
- *     Инструкция
- *     Выход
- *     Вывод
- *     Помощь
- *
- *   Вывод:
- *     \n
- *     ;
- *
- *   Выход:
- *     quit
- *
- *   Помощь:
- *     help
- *
- *   Инструкция:
- *     Выражение
- *     Объявление
- *     Присваивание
- *
- *   Объявление:
- *     const name = Выражение
- *     let name = Выражение
- *
- *   Присваивание:
- *     name = Выражение
- *
- *   Выражение:
- *     Терм
- *     Выражение + Терм
- *     Выражение - Терм
- *
- *   Терм:
- *     Первичное_выражение
- *     Терм * Первичное_выражение
- *     Терм / Первичное_выражение
- *     Терм % Первичное_выражение
- *
- *   Первичное_выражение:
- *     Число
- *     ( Выражение )
- *     { Выражение }
- *     [ Выражение ]
- *     + Первичное_выражение
- *     - Первичное_выражение
- *
- *   Переменная:
- *     Выражение
- *
- *   Число:
- *     Литерал_с_плавающей_точкой
- *
- */
-
-
-#include "token.h"
+﻿#include "token.h"
 #include "variable.h"
 #include <iostream>
 #include <string>
@@ -71,25 +9,30 @@ double expression(TokenStream& ts);
 
 double declaration(TokenStream& ts) // add function handling in this function
 {
-  Token kw = ts.get();
-
-  bool is_const{};
-  if (kw.kind == CONST) is_const = true;
-  else if (kw.kind == LET) is_const = false;
-
   Token t = ts.get();
-  if (t.kind != NAME)
-    throw std::runtime_error{"declaration(): variable name required in initialization"};
-  std::string var_name{ t.name };
 
-  t = ts.get();
-  if (t.kind != '=')
-    throw std::runtime_error{"declaration(): missed '=' in declaration"};
+  switch (t.kind)
+  {
+    case CONST:
+    case LET:
+    {
+      bool is_const{};
+      if (t.kind == CONST) is_const = true;
+      else if (t.kind == LET) is_const = false;
+      Token t1 = ts.get();
+      if (t1.kind != NAME) throw std::runtime_error{"declaration(): variable name required in initialization"};
+      std::string var_name{ t1.name };
+      t1 = ts.get();
+      if (t1.kind != '=')
+        throw std::runtime_error{"declaration(): missed '=' in declaration"};
+      double d{ expression(ts) };
+      var_scope.define(var_name, d, is_const);
+      return d;
+    }
 
-  double d{ expression(ts) };
-  var_scope.define(var_name, d, is_const);
-
-  return d;
+    default:
+      throw std::runtime_error{"declaration(): func definition does not realised"};
+  }
 }
 
 double primary(TokenStream& ts)
