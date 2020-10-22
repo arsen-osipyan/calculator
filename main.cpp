@@ -237,40 +237,22 @@ void calculate()
 
   while (std::cin)
   {
-    try
-    {
-      std::cout << PROMPT;
-      Token t = ts.get();
+    std::cout << PROMPT;
+    Token t = ts.get();
 
-      while (t.kind == PRINT)
-        t = ts.get();
+    while (t.kind == PRINT)
+      t = ts.get();
 
-      if (t.kind == HELP)
-      {
-        print_help();
-        continue;
-      }
+    if (t.kind == HELP)
+    {
+      print_help();
+      continue;
+    }
 
-      if (t.kind == QUIT) return;
+    if (t.kind == QUIT) return;
 
-      ts.putback(t);
-      std::cout << RESULT << statement(ts) << std::endl;
-    }
-    catch (TokenError& e)
-    {
-      std::cerr << e.what << std::endl;
-      ts.clean();
-    }
-    catch (VariableError& e)
-    {
-      std::cerr << e.what << std::endl;
-      ts.clean();
-    }
-    catch (std::runtime_error& e)
-    {
-      std::cerr << e.what() << std::endl;
-      ts.clean();
-    }
+    ts.putback(t);
+    std::cout << RESULT << statement(ts) << std::endl;
   }
 }
 
@@ -286,24 +268,14 @@ int main()
 
     return 0;
   }
-  catch (TokenError& e)
-  {
-    std::cerr << "TokenError: " << e.what << '\n';
-    return 1;
-  }
-  catch (VariableError& e)
-  {
-    std::cerr << "VariableError: " << e.what << '\n';
-    return 1;
-  }
   catch (std::exception& e)
   {
-    std::cerr << "RunTimeError: " << e.what() <<'\n';
+    std::cerr << "RunTimeError: " << e.what() << "." << std::endl;
     return 1;
   }
   catch (...)
   {
-    std::cerr << "Something went wrong.\n";
+    std::cerr << "Something went wrong." << std::endl;
     return 2;
   }
 }
