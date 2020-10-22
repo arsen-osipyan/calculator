@@ -27,21 +27,22 @@ class VariableError
       : what{ str } { }
 };
 
-class SymbolTable
+class VarTable
 {
   private:
     std::vector<Variable> var_table;
 
   public:
-    SymbolTable () = default;
+    VarTable () = default;
 
+    std::vector<Variable> get_table() const { return var_table; }
     double get(std::string s);
     bool is_declared (std::string var);
     double define (std::string var, double val, bool is_const);
     double set (std::string var, double val);
 };
 
-extern SymbolTable var_scope;
+extern VarTable var_scope;
 
 
 #endif // VARIABLE_H

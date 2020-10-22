@@ -56,7 +56,6 @@ Token TokenStream::get()
         std::cin.putback(ch);
         if (s == DECLKEY) return Token{ LET };
         if (s == CONSTKEY) return Token{ CONST };
-        if (s == FUNCKEY) return Token{ FUNC };
         if (s == QUITKEY) return Token{ QUIT };
         if (s == HELPKEY) return Token{ HELP };
         return Token{ NAME, s };

@@ -5,9 +5,43 @@
 #include <vector>
 
 
+struct Result
+{
+  char kind;
+  double val;
+
+  Result () = delete;
+  Result (char c, double v)
+    : kind{ c }, val{ v } { }
+};
+
+
+void print_help()
+{
+  std::cout << "==========================================\n"
+            << "                Calculator                \n"
+            << "\n"
+            << "  1) help - print manual                  \n"
+            << "  2) quit - exit calculator               \n"
+            << "  3) let, const - define variable or      \n"
+            << "  constant                                \n"
+            << "  4) ';' or '\\n' - end of statement      \n"
+            << "  Constants:                              \n";
+
+  for (Variable& v : var_scope.get_table())
+  {
+    if (v.is_constant)
+    {
+      std::cout << "   - " << v.name << " = " << v.value << "\n";
+    }
+  }
+
+  std::cout << "==========================================\n";
+}
+
 double expression(TokenStream& ts);
 
-double declaration(TokenStream& ts) // add function handling in this function
+double declaration(TokenStream& ts)
 {
   Token t = ts.get();
 
@@ -16,22 +50,25 @@ double declaration(TokenStream& ts) // add function handling in this function
     case CONST:
     case LET:
     {
-      bool is_const{};
+      bool is_const;
       if (t.kind == CONST) is_const = true;
       else if (t.kind == LET) is_const = false;
-      Token t1 = ts.get();
-      if (t1.kind != NAME) throw std::runtime_error{"declaration(): variable name required in initialization"};
-      std::string var_name{ t1.name };
-      t1 = ts.get();
-      if (t1.kind != '=')
-        throw std::runtime_error{"declaration(): missed '=' in declaration"};
+
+      t = ts.get();
+      if (t.kind != NAME) throw std::runtime_error{"declaration(): variable name required in initialization"};
+      std::string var_name{ t.name };
+
+      t = ts.get();
+      if (t.kind != '=') throw std::runtime_error{"declaration(): missed '=' in declaration"};
+
       double d{ expression(ts) };
       var_scope.define(var_name, d, is_const);
+
       return d;
     }
 
     default:
-      throw std::runtime_error{"declaration(): func definition does not realised"};
+      throw std::runtime_error{"declaration(): undefined keyword to declaration"};
   }
 }
 
@@ -168,7 +205,6 @@ double statement(TokenStream& ts)
   {
     case LET:
     case CONST:
-    case FUNC:
       ts.putback(t);
       return declaration(ts);
 
@@ -211,7 +247,7 @@ void calculate()
 
       if (t.kind == HELP)
       {
-        std::cout << RESULT << "I <3 U" << std::endl;
+        print_help();
         continue;
       }
 
