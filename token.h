@@ -10,10 +10,11 @@ constexpr char NUMBER{ '8' };            // For numbers
 constexpr char QUIT{ 'q' };              // For quit
 constexpr char PRINT{ ';' };             // For print
 constexpr char HELP{ 'h' };              // For help
-constexpr char NAME{ 'a' };              // For variable name
+constexpr char NAME{ '~' };              // For variable name
 constexpr char LET{ 'l' };               // For DECLKEY keyword
 constexpr char CONST{ 'c' };             // For CONSTKEY keyword
 constexpr char INIT{ '=' };              // For variable initialization
+constexpr char ENDLINE{ '\n' };          // For end of line
 
 const std::string PROMPT{ "> " };        // String before inputing statement
 const std::string RESULT{ "= " };        // String before printing result

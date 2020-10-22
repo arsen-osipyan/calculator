@@ -11,7 +11,7 @@ double VarTable::get (std::string s)
   for (Variable& v : var_table)
     if (v.name == s) return v.value;
 
-  throw VariableError("undefined variable " + s);
+  throw VariableError("undefined variable " + s + "");
 }
 
 bool VarTable::is_declared (std::string var)

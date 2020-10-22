@@ -4,16 +4,9 @@
 #include <string>
 #include <vector>
 
-
-struct Result
-{
-  char kind;
-  double val;
-
-  Result () = delete;
-  Result (char c, double v)
-    : kind{ c }, val{ v } { }
-};
+// Bugs
+// 1. Infinite printing "TokenError" when reading "."
+// 2. Twice prompt printing when "TokenError"
 
 
 void print_help()
@@ -230,29 +223,69 @@ double statement(TokenStream& ts)
   }
 }
 
-void calculate()
+Token calculate(TokenStream& ts)
+{
+  Token t = ts.get();
+
+  switch (t.kind)
+  {
+    case PRINT:
+      return Token { PRINT };
+
+    case ENDLINE:
+      return Token{ ENDLINE };
+
+    case QUIT:
+      return Token{ QUIT };
+
+    case HELP:
+      return Token{ HELP };
+
+    default:
+      ts.putback(t);
+      return Token{ NUMBER, statement(ts) };
+  }
+}
+
+void run()
 {
   TokenStream ts;
   std::cout.precision(15);
 
-  while (std::cin)
+  while (true)
   {
-    std::cout << PROMPT;
-    Token t = ts.get();
-
-    while (t.kind == PRINT)
-      t = ts.get();
-
-    if (t.kind == HELP)
+    try
     {
-      print_help();
-      continue;
+      std::cout << PROMPT;
+      Token res = calculate(ts);
+
+      while (res.kind != ENDLINE)
+      {
+        if (res.kind == NUMBER)
+          std::cout << RESULT << res.value << '\n';
+        if (res.kind == HELP)
+          print_help();
+        if (res.kind == QUIT)
+          return;
+
+        res = calculate(ts);
+      }
     }
-
-    if (t.kind == QUIT) return;
-
-    ts.putback(t);
-    std::cout << RESULT << statement(ts) << std::endl;
+    catch (TokenError& e)
+    {
+      std::cout << "TokenError: " << e.what << ".\n";
+      ts.clean(); // realise ignore cleaning
+    }
+    catch (VariableError& e)
+    {
+      std::cout << "VariableError: " << e.what << ".\n";
+      ts.clean();
+    }
+    catch (std::runtime_error& e)
+    {
+      std::cerr << "RunTimeError: " << e.what() << "." << std::endl;
+      ts.clean();
+    }
   }
 }
 
@@ -264,14 +297,9 @@ int main()
     var_scope.define("pi", 3.1415926535, true);
     var_scope.define("e", 2.7182818284, true);
 
-    calculate();
+    run();
 
     return 0;
-  }
-  catch (std::exception& e)
-  {
-    std::cerr << "RunTimeError: " << e.what() << "." << std::endl;
-    return 1;
   }
   catch (...)
   {
