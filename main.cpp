@@ -5,8 +5,8 @@
 #include <vector>
 
 // Bugs
-// 1. Infinite printing "TokenError" when reading "."
-// 2. Twice prompt printing when "TokenError"
+// 1. Multiple output when input splited with space chars
+// 2. fix when input "2e"
 
 
 void print_help()
@@ -48,10 +48,12 @@ double declaration(TokenStream& ts)
       else if (t.kind == LET) is_const = false;
 
       t = ts.get();
+      if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
       if (t.kind != NAME) throw std::runtime_error{"declaration(): variable name required in initialization"};
       std::string var_name{ t.name };
 
       t = ts.get();
+      if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
       if (t.kind != '=') throw std::runtime_error{"declaration(): missed '=' in declaration"};
 
       double d{ expression(ts) };
@@ -111,6 +113,7 @@ double primary(TokenStream& ts)
       return primary(ts);
 
     default:
+      if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
       throw std::runtime_error{"primary(): primary expected"};
   }
 }
@@ -203,15 +206,24 @@ double statement(TokenStream& ts)
 
     case NAME:
     {
+      var_scope.get(t.name); // checking variable
+
       Token t1 = ts.get();
       if (t1.kind == INIT)
       {
         double d{ expression(ts) };
-        return var_scope.set(t.name, d);
+        char tbr{};
+
+        std::cin.putback(ENDLINE);
+        double tmp{ var_scope.set(t.name, d) };
+        std::cin.get(tbr);
+
+        return tmp;
       }
       else
       {
         ts.putback(t1);
+        // if (t1.kind == ENDLINE) std::cin.putback(ENDLINE);
         ts.putback(t);
         return expression(ts);
       }
@@ -230,7 +242,7 @@ Token calculate(TokenStream& ts)
   switch (t.kind)
   {
     case PRINT:
-      return Token { PRINT };
+      return Token{ PRINT };
 
     case ENDLINE:
       return Token{ ENDLINE };
@@ -252,11 +264,11 @@ void run()
   TokenStream ts;
   std::cout.precision(15);
 
-  while (true)
+  while (std::cin.good())
   {
     try
     {
-      std::cout << PROMPT;
+      std::cerr << PROMPT;
       Token res = calculate(ts);
 
       while (res.kind != ENDLINE)
@@ -268,23 +280,28 @@ void run()
         if (res.kind == QUIT)
           return;
 
-        res = calculate(ts);
+
+        Token new_res = calculate(ts);
+        res = new_res;
       }
     }
     catch (TokenError& e)
     {
       std::cout << "TokenError: " << e.what << ".\n";
-      ts.clean(); // realise ignore cleaning
+      ts.ignore(ENDLINE, false);
+      continue;
     }
     catch (VariableError& e)
     {
       std::cout << "VariableError: " << e.what << ".\n";
-      ts.clean();
+      ts.ignore(ENDLINE, false);
+      continue;
     }
     catch (std::runtime_error& e)
     {
-      std::cerr << "RunTimeError: " << e.what() << "." << std::endl;
-      ts.clean();
+      std::cout << "RunTimeError: " << e.what() << ".\n";
+      ts.ignore(ENDLINE, false);
+      continue;
     }
   }
 }

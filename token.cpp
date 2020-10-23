@@ -50,6 +50,11 @@ Token TokenStream::get()
       std::cin.putback(ch);    // first digit returns to input stream
       double val;
       std::cin >> val;         // reading float number
+      if (!std::cin.good() && !std::cin.eof())
+      {
+        std::cin.clear();
+        throw TokenError{"bad token"};
+      }
       return Token{ NUMBER, val };
     }
 
@@ -78,20 +83,17 @@ void TokenStream::putback(Token t)
   buffer.push_back(t);
 }
 
-void TokenStream::ignore(char token_kind)
+void TokenStream::ignore(char break_char, bool ptbck)
 {
+  buffer.clear();
   while (true)
   {
-    Token t{ get() };
-    if (t.kind == token_kind)
+    char ch;
+    std::cin.get(ch);
+    if (ch == break_char)
     {
-      putback(t);
+      if (ptbck) std::cin.putback(break_char);
       return;
     }
   }
-}
-
-void TokenStream::clean ()
-{
-  buffer.clear();
 }

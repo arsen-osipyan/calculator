@@ -48,8 +48,7 @@ class TokenStream
   public:
     Token get();
     void putback(Token t);
-    void ignore(char c);
-    void clean();
+    void ignore(char c, bool ptbck);
 
     TokenStream()
       : buffer{ } { }
