@@ -6,7 +6,7 @@
 
 // Bugs
 // 1. Multiple output when input splited with space chars
-// 2. fix when input "2e"
+// 2. Fix when assignment to const value
 
 
 void print_help()
@@ -212,11 +212,11 @@ double statement(TokenStream& ts)
       if (t1.kind == INIT)
       {
         double d{ expression(ts) };
-        char tbr{};
 
-        std::cin.putback(ENDLINE);
+//        ts.putback(ENDLINE);
         double tmp{ var_scope.set(t.name, d) };
-        std::cin.get(tbr);
+//        Token tbr = ts.get();
+//        if (tbr.kind == ENDLINE) ts.putback(tbr);
 
         return tmp;
       }
