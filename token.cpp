@@ -83,17 +83,13 @@ void TokenStream::putback(Token t)
   buffer.push_back(t);
 }
 
-void TokenStream::ignore(char break_char, bool ptbck)
+void TokenStream::ignore(char break_char)
 {
   buffer.clear();
   while (true)
   {
     char ch;
     std::cin.get(ch);
-    if (ch == break_char)
-    {
-      if (ptbck) std::cin.putback(break_char);
-      return;
-    }
+    if (ch == break_char) return;
   }
 }

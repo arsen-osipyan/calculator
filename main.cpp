@@ -67,6 +67,28 @@ double declaration(TokenStream& ts)
   }
 }
 
+double assignment(TokenStream& ts)
+{
+  Token t = ts.get();
+  var_scope.get(t.name);
+  Token t1 = ts.get();
+
+  if (t1.kind == INIT)
+  {
+    double d{ expression(ts) };
+    Token tmp = ts.get();
+    if (tmp.kind == ENDLINE) std::cin.putback(ENDLINE);
+    var_scope.set(t.name, d);
+    return d;
+  }
+  else
+  {
+    ts.putback(t1);
+    ts.putback(t);
+    return expression(ts);
+  }
+}
+
 double primary(TokenStream& ts)
 {
   Token t = ts.get();
@@ -113,7 +135,7 @@ double primary(TokenStream& ts)
       return primary(ts);
 
     default:
-      if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
+      if (t.kind == ENDLINE || t.kind == PRINT) std::cin.putback(t.kind);
       throw std::runtime_error{"primary(): primary expected"};
   }
 }
@@ -205,29 +227,8 @@ double statement(TokenStream& ts)
       return declaration(ts);
 
     case NAME:
-    {
-      var_scope.get(t.name); // checking variable
-
-      Token t1 = ts.get();
-      if (t1.kind == INIT)
-      {
-        double d{ expression(ts) };
-
-//        ts.putback(ENDLINE);
-        double tmp{ var_scope.set(t.name, d) };
-//        Token tbr = ts.get();
-//        if (tbr.kind == ENDLINE) ts.putback(tbr);
-
-        return tmp;
-      }
-      else
-      {
-        ts.putback(t1);
-        // if (t1.kind == ENDLINE) std::cin.putback(ENDLINE);
-        ts.putback(t);
-        return expression(ts);
-      }
-    }
+      ts.putback(t);
+      return assignment(ts);
 
     default:
       ts.putback(t);
@@ -288,19 +289,22 @@ void run()
     catch (TokenError& e)
     {
       std::cout << "TokenError: " << e.what << ".\n";
-      ts.ignore(ENDLINE, false);
+      // std::cin.clear();
+      ts.ignore(ENDLINE);
       continue;
     }
     catch (VariableError& e)
     {
       std::cout << "VariableError: " << e.what << ".\n";
-      ts.ignore(ENDLINE, false);
+      // std::cin.clear();
+      ts.ignore(ENDLINE);
       continue;
     }
     catch (std::runtime_error& e)
     {
       std::cout << "RunTimeError: " << e.what() << ".\n";
-      ts.ignore(ENDLINE, false);
+      // std::cin.clear();
+      ts.ignore(ENDLINE);
       continue;
     }
   }
