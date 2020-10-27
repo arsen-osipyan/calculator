@@ -3,11 +3,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
 
-// Bugs
-// 1. Multiple output when input splited with space chars
-// 2. Fix when assignment to const value
 
+double expression(TokenStream& ts);
 
 void print_help()
 {
@@ -22,17 +21,11 @@ void print_help()
             << "  Constants:                              \n";
 
   for (Variable& v : var_scope.get_table())
-  {
     if (v.is_constant)
-    {
       std::cout << "   - " << v.name << " = " << v.value << "\n";
-    }
-  }
 
   std::cout << "==========================================\n";
 }
-
-double expression(TokenStream& ts);
 
 double declaration(TokenStream& ts)
 {
@@ -49,7 +42,7 @@ double declaration(TokenStream& ts)
 
       t = ts.get();
       if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
-      if (t.kind != NAME) throw std::runtime_error{"declaration(): variable name required in initialization"};
+      if (t.kind != NAME) throw std::runtime_error{"declaration(): variable name required in declaration"};
       std::string var_name{ t.name };
 
       t = ts.get();
@@ -140,7 +133,7 @@ double primary(TokenStream& ts)
   }
 }
 
-double term(TokenStream& ts)
+double preterm(TokenStream& ts)
 {
   double left = primary(ts);
   Token t = ts.get();
@@ -149,36 +142,61 @@ double term(TokenStream& ts)
   {
     switch (t.kind)
     {
-      case '*':
-      {
-        left *= primary(ts);
+      case '^':
+        left = pow(left, primary(ts));
         t = ts.get();
         break;
-      }
+
+      default:
+        ts.putback(t);
+        return left;
+    }
+  }
+}
+
+double term(TokenStream& ts)
+{
+  double left = preterm(ts);
+  Token t = ts.get();
+
+  while (true)
+  {
+    switch (t.kind)
+    {
+      case '*':
+        left *= preterm(ts);
+        t = ts.get();
+        break;
 
       case '/':
       {
-        double d = primary(ts);
-        if (d == 0) throw std::runtime_error{"term(): divide by zero"};
-        left /= d;
+        double d = preterm(ts);
         t = ts.get();
+        if (d == 0)
+        {
+          if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
+          throw std::runtime_error{ "term(): '/' divide by zero" };
+        }
+        left /= d;
         break;
       }
 
       case '%':
       {
-        double d = primary(ts);
-        if (d == 0) throw std::runtime_error{"term(): divide by zero"};
-        left -= int(left / d) * d;
+        double d = preterm(ts);
         t = ts.get();
+        if (d == 0)
+        {
+          if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
+          throw std::runtime_error{ "term(): '%' divide by zero" };
+        }
+        left -= int(left / d) * d;
         break;
       }
 
       default:
-      {
         ts.putback(t);
         return left;
-      }
     }
   }
 }
@@ -193,24 +211,18 @@ double expression(TokenStream& ts)
     switch (t.kind)
     {
       case '+':
-      {
         left += term(ts);
         t = ts.get();
         break;
-      }
 
       case '-':
-      {
         left -= term(ts);
         t = ts.get();
         break;
-      }
 
       default:
-      {
         ts.putback(t);
         return left;
-      }
     }
   }
 }
@@ -281,7 +293,6 @@ void run()
         if (res.kind == QUIT)
           return;
 
-
         Token new_res = calculate(ts);
         res = new_res;
       }
@@ -289,21 +300,18 @@ void run()
     catch (TokenError& e)
     {
       std::cout << "TokenError: " << e.what << ".\n";
-      // std::cin.clear();
       ts.ignore(ENDLINE);
       continue;
     }
     catch (VariableError& e)
     {
       std::cout << "VariableError: " << e.what << ".\n";
-      // std::cin.clear();
       ts.ignore(ENDLINE);
       continue;
     }
     catch (std::runtime_error& e)
     {
       std::cout << "RunTimeError: " << e.what() << ".\n";
-      // std::cin.clear();
       ts.ignore(ENDLINE);
       continue;
     }
@@ -315,8 +323,8 @@ int main()
 {
   try
   {
-    var_scope.define("pi", 3.1415926535, true);
-    var_scope.define("e", 2.7182818284, true);
+    var_scope.define("pi", 3.141592653589793, true);
+    var_scope.define("e",  2.718281828459045, true);
 
     run();
 

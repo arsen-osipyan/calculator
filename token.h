@@ -6,22 +6,22 @@
 #include <vector>
 
 
-constexpr char NUMBER{ '8' };            // For numbers
-constexpr char QUIT{ 'q' };              // For quit
-constexpr char PRINT{ ';' };             // For print
-constexpr char HELP{ 'h' };              // For help
-constexpr char NAME{ '~' };              // For variable name
-constexpr char LET{ 'l' };               // For DECLKEY keyword
-constexpr char CONST{ 'c' };             // For CONSTKEY keyword
-constexpr char INIT{ '=' };              // For variable initialization
-constexpr char ENDLINE{ '\n' };          // For end of line
+constexpr char NUMBER{ '8' };            // for numbers
+constexpr char QUIT{ 'q' };              // for quit
+constexpr char PRINT{ ';' };             // for print
+constexpr char HELP{ 'h' };              // for help
+constexpr char NAME{ '~' };              // for variable name
+constexpr char LET{ 'l' };               // for DECLKEY keyword
+constexpr char CONST{ 'c' };             // for CONSTKEY keyword
+constexpr char INIT{ '=' };              // for variable initialization
+constexpr char ENDLINE{ '\n' };          // for end of line
 
-const std::string PROMPT{ "> " };        // String before inputing statement
-const std::string RESULT{ "= " };        // String before printing result
-const std::string DECLKEY{ "let" };      // For variable declaration
-const std::string CONSTKEY{ "const" };   // For constant declaration
-const std::string HELPKEY{ "help" };     // For get help
-const std::string QUITKEY{ "quit" };     // For quit
+const std::string PROMPT{ "> " };        // string before inputing statement
+const std::string RESULT{ "= " };        // string before printing result
+const std::string DECLKEY{ "let" };      // for variable declaration
+const std::string CONSTKEY{ "const" };   // for constant declaration
+const std::string HELPKEY{ "help" };     // for get help
+const std::string QUITKEY{ "quit" };     // for quit
 
 
 class Token

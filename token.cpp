@@ -28,7 +28,7 @@ Token TokenStream::get()
     case '(': case ')':
     case '{': case '}':
     case '[': case ']':
-    case '%':
+    case '%': case '^':
     case '+': case '-':
     case '*': case '/':
       return Token{ ch };      // every symbol represents itself
@@ -44,7 +44,7 @@ Token TokenStream::get()
         if (!isdigit(tbr))
         {
           std::cin.putback(tbr);
-          throw TokenError{"bad token"};
+          throw TokenError{ "bad token" };
         }
       }
       std::cin.putback(ch);    // first digit returns to input stream
@@ -53,7 +53,7 @@ Token TokenStream::get()
       if (!std::cin.good() && !std::cin.eof())
       {
         std::cin.clear();
-        throw TokenError{"bad token"};
+        throw TokenError{ "bad token" };
       }
       return Token{ NUMBER, val };
     }

@@ -27,13 +27,13 @@ class VariableError
       : what{ str } { }
 };
 
-class VarTable
+class VariableScope
 {
   private:
     std::vector<Variable> var_table;
 
   public:
-    VarTable () = default;
+    VariableScope () = default;
 
     std::vector<Variable> get_table() const { return var_table; }
     double get(std::string s);
@@ -42,7 +42,7 @@ class VarTable
     double set (std::string var, double val);
 };
 
-extern VarTable var_scope;
+extern VariableScope var_scope;
 
 
 #endif // VARIABLE_H
