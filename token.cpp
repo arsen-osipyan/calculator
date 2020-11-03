@@ -17,8 +17,10 @@ Token TokenStream::get()
   while (true)
   {
     std::cin.get(ch);
-    if (std::cin.eof()) return Token{QUIT};
+    if (std::cin.eof()) return Token{ QUIT };
     if (ch == ENDLINE || !isspace(ch)) break;
+    for (char c : ALLOWED) if (c == ch) break;
+    if (!isspace(ch)) throw TokenError{ "bad token" };
   }
 
   switch (ch)
@@ -38,15 +40,13 @@ Token TokenStream::get()
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
     {
-      while (ch == '.')
+      if (ch == '.')
       {
         char tbr;
         std::cin.get(tbr);
+        std::cin.putback(tbr);
         if (!isdigit(tbr))
-        {
-          std::cin.putback(tbr);
           throw TokenError{ "bad token" };
-        }
       }
       std::cin.putback(ch);    // first digit returns to input stream
       double val;
@@ -72,6 +72,7 @@ Token TokenStream::get()
         if (s == CONSTKEY) return Token{ CONST };
         if (s == QUITKEY)  return Token{ QUIT };
         if (s == HELPKEY)  return Token{ HELP };
+        for (std::string f_name : FUNCKEYS) if (f_name == s) return Token{ FUNC, s };
         return Token{ NAME, s };
       }
       throw TokenError{ "bad token" };

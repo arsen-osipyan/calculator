@@ -1,4 +1,7 @@
-﻿#include "token.h"
+﻿// if we will reassign input and output stream
+#define STREAM_REASSIGNING
+
+#include "token.h"
 #include "variable.h"
 #include <iostream>
 #include <string>
@@ -58,6 +61,45 @@ double declaration(TokenStream& ts)
     default:
       throw std::runtime_error{"declaration(): undefined keyword to declaration"};
   }
+}
+
+double function(TokenStream& ts)
+{
+  Token fname{ ts.get() };
+
+  Token t{ ts.get() };
+  if (t.kind != '(')
+  {
+    if (t.kind == ENDLINE || t.kind == PRINT) std::cin.putback(t.kind);
+    throw std::runtime_error{ "function(): primary '(' expected" };
+  }
+
+  double d{ expression(ts) };
+
+  t = ts.get();
+  if (t.kind != ')')
+  {
+    if (t.kind == ENDLINE || t.kind == PRINT) std::cin.putback(t.kind);
+    throw std::runtime_error{ "function(): primary ')' expected" };
+  }
+
+  if      (fname.name == "sin")    return sin(d);
+  else if (fname.name == "cos")    return cos(d);
+  else if (fname.name == "tg")     return tan(d);
+  else if (fname.name == "ctg")    return 1. / tan(d);
+  else if (fname.name == "arcsin") return asin(d);
+  else if (fname.name == "arccos") return acos(d);
+  else if (fname.name == "arctg")  return atan(d);
+  else if (fname.name == "arcctg") return acos(-1)/2 - atan(d);
+  else if (fname.name == "abs")    return fabs(d);
+  else if (fname.name == "sqrt")   return sqrt(d);
+  else if (fname.name == "ch")     return cosh(d);
+  else if (fname.name == "sh")     return sinh(d);
+  else if (fname.name == "th")     return tanh(d);
+  else if (fname.name == "cth")    return 1. / tanh(d);
+  else if (fname.name == "exp")    return exp(d);
+  else if (fname.name == "ln")     return log(d);
+  else if (fname.name == "lg")     return log(d) / log(10);
 }
 
 double assignment(TokenStream& ts)
@@ -120,6 +162,10 @@ double primary(TokenStream& ts)
 
     case NAME:
       return var_scope.get(t.name);
+
+    case FUNC:
+      ts.putback(t);
+      return function(ts);
 
     case '-':
       return -primary(ts);
@@ -275,13 +321,15 @@ Token calculate(TokenStream& ts)
 void run()
 {
   TokenStream ts;
-  std::cout.precision(15);
+  std::cout.precision(8);
 
   while (std::cin.good())
   {
     try
     {
+#ifndef STREAM_REASSIGNING
       std::cerr << PROMPT;
+#endif
       Token res = calculate(ts);
 
       while (res.kind != ENDLINE)
@@ -323,7 +371,7 @@ int main()
 {
   try
   {
-    var_scope.define("pi", 3.141592653589793, true);
+    var_scope.define("pi", acos(-1.), true);
     var_scope.define("e",  2.718281828459045, true);
     var_scope.define("G",  6.67e-11, true);
 
