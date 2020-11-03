@@ -17,6 +17,7 @@ Token TokenStream::get()
   while (true)
   {
     std::cin.get(ch);
+    if (std::cin.eof()) return Token{QUIT};
     if (ch == ENDLINE || !isspace(ch)) break;
   }
 

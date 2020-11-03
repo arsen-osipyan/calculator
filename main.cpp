@@ -325,6 +325,7 @@ int main()
   {
     var_scope.define("pi", 3.141592653589793, true);
     var_scope.define("e",  2.718281828459045, true);
+    var_scope.define("G",  6.67e-11, true);
 
     run();
 

@@ -21,7 +21,7 @@ const std::string RESULT{ "= " };        // string before printing result
 const std::string DECLKEY{ "let" };      // for variable declaration
 const std::string CONSTKEY{ "const" };   // for constant declaration
 const std::string HELPKEY{ "help" };     // for get help
-const std::string QUITKEY{ "quit" };     // for quit
+const std::string QUITKEY{ "exit" };     // for quit
 
 
 class Token
