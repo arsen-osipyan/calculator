@@ -1,5 +1,5 @@
 ﻿// if we will reassign input and output stream
-#define STREAM_REASSIGNING
+// #define STREAM_REASSIGNING
 
 #include "token.h"
 #include "variable.h"
@@ -17,7 +17,7 @@ void print_help()
             << "                Calculator                \n"
             << "\n"
             << "  1) help - print manual                  \n"
-            << "  2) quit - exit calculator               \n"
+            << "  2) exit - exit calculator               \n"
             << "  3) let, const - define variable or      \n"
             << "  constant                                \n"
             << "  4) ';' or '\\n' - end of statement      \n"
