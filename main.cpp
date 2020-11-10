@@ -1,7 +1,4 @@
-﻿// if we will reassign input and output stream
-// #define STREAM_REASSIGNING
-
-#include "token.h"
+﻿#include "token.h"
 #include "variable.h"
 #include <iostream>
 #include <string>
@@ -44,12 +41,12 @@ double declaration(TokenStream& ts)
       else if (t.kind == LET) is_const = false;
 
       t = ts.get();
-      if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
+      if (t.kind == ENDLINE || t.kind == PRINT) ts.putback(t);
       if (t.kind != NAME) throw std::runtime_error{"declaration(): variable name required in declaration"};
       std::string var_name{ t.name };
 
       t = ts.get();
-      if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
+      if (t.kind == ENDLINE || t.kind == PRINT) ts.putback(t);
       if (t.kind != '=') throw std::runtime_error{"declaration(): missed '=' in declaration"};
 
       double d{ expression(ts) };
@@ -70,7 +67,7 @@ double function(TokenStream& ts)
   Token t{ ts.get() };
   if (t.kind != '(')
   {
-    if (t.kind == ENDLINE || t.kind == PRINT) std::cin.putback(t.kind);
+    if (t.kind == ENDLINE || t.kind == PRINT) ts.putback(t);
     throw std::runtime_error{ "function(): primary '(' expected" };
   }
 
@@ -79,7 +76,7 @@ double function(TokenStream& ts)
   t = ts.get();
   if (t.kind != ')')
   {
-    if (t.kind == ENDLINE || t.kind == PRINT) std::cin.putback(t.kind);
+    if (t.kind == ENDLINE || t.kind == PRINT) ts.putback(t);
     throw std::runtime_error{ "function(): primary ')' expected" };
   }
 
@@ -100,6 +97,7 @@ double function(TokenStream& ts)
   else if (fname.name == "exp")    return exp(d);
   else if (fname.name == "ln")     return log(d);
   else if (fname.name == "lg")     return log(d) / log(10);
+  else throw std::runtime_error{ "function(): no such function" };
 }
 
 double assignment(TokenStream& ts)
@@ -112,7 +110,7 @@ double assignment(TokenStream& ts)
   {
     double d{ expression(ts) };
     Token tmp = ts.get();
-    if (tmp.kind == ENDLINE) std::cin.putback(ENDLINE);
+    if (tmp.kind == ENDLINE || tmp.kind == PRINT) ts.putback(t);
     var_scope.set(t.name, d);
     return d;
   }
@@ -174,7 +172,7 @@ double primary(TokenStream& ts)
       return primary(ts);
 
     default:
-      if (t.kind == ENDLINE || t.kind == PRINT) std::cin.putback(t.kind);
+      if (t.kind == ENDLINE || t.kind == PRINT) ts.putback(t);
       throw std::runtime_error{"primary(): primary expected"};
   }
 }
@@ -218,11 +216,7 @@ double term(TokenStream& ts)
       {
         double d = preterm(ts);
         t = ts.get();
-        if (d == 0)
-        {
-          if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
-          throw std::runtime_error{ "term(): '/' divide by zero" };
-        }
+        if (d == 0) throw std::runtime_error{ "term(): '/' divide by zero" };
         left /= d;
         break;
       }
@@ -231,11 +225,7 @@ double term(TokenStream& ts)
       {
         double d = preterm(ts);
         t = ts.get();
-        if (d == 0)
-        {
-          if (t.kind == ENDLINE) std::cin.putback(ENDLINE);
-          throw std::runtime_error{ "term(): '%' divide by zero" };
-        }
+        if (d == 0) throw std::runtime_error{ "term(): '%' divide by zero" };
         left -= int(left / d) * d;
         break;
       }
@@ -323,45 +313,85 @@ void run()
   TokenStream ts;
   std::cout.precision(8);
 
-  while (std::cin.good())
+  while (std::cin)
   {
-    try
-    {
-#ifndef STREAM_REASSIGNING
-      std::cerr << PROMPT;
-#endif
-      Token res = calculate(ts);
+    std::cout << PROMPT;
+    Token res = Token{ PRINT };
+    Token last = Token{ ENDLINE };
+    bool skip{ false };
 
-      while (res.kind != ENDLINE)
+    while (res.kind != ENDLINE)
+    {
+      try
       {
-        if (res.kind == NUMBER)
-          std::cout << RESULT << res.value << '\n';
-        if (res.kind == HELP)
-          print_help();
-        if (res.kind == QUIT)
-          return;
+        res = calculate(ts);
 
-        Token new_res = calculate(ts);
-        res = new_res;
+        if ((res.kind == PRINT || res.kind == ENDLINE) && skip)
+        {
+          skip = false;
+          last = res;
+          continue;
+        }
+
+        if (!skip)
+        {
+          if (last.kind == NUMBER)
+          {
+            if (res.kind == NUMBER || res.kind == HELP || res.kind == QUIT)
+              throw std::runtime_error{ "run(): incorrect statement" };
+            else if (res.kind == PRINT) std::cout << RESULT << last.value << '\n';
+            else if (res.kind == ENDLINE)
+            {
+              std::cout << RESULT << last.value << '\n';
+              last = res;
+              break;
+            }
+          }
+          else if (last.kind == HELP)
+          {
+            if (res.kind == NUMBER || res.kind == HELP || res.kind == QUIT)
+              throw std::runtime_error{ "run(): incorrect statement" };
+            else if (res.kind == PRINT) print_help();
+            else if (res.kind == ENDLINE)
+            {
+              print_help();
+              last = res;
+              break;
+            }
+          }
+          else if (last.kind == QUIT)
+          {
+            if (res.kind == NUMBER || res.kind == HELP || res.kind == QUIT)
+              throw std::runtime_error{ "run(): incorrect statement" };
+            else if (res.kind == PRINT || res.kind == ENDLINE || res.kind == QUIT) return;
+          }
+        }
+
+        last = res;
+
+        if (std::cin.eof()) return;
       }
-    }
-    catch (TokenError& e)
-    {
-      std::cout << "TokenError: " << e.what << ".\n";
-      ts.ignore(ENDLINE);
-      continue;
-    }
-    catch (VariableError& e)
-    {
-      std::cout << "VariableError: " << e.what << ".\n";
-      ts.ignore(ENDLINE);
-      continue;
-    }
-    catch (std::runtime_error& e)
-    {
-      std::cout << "RunTimeError: " << e.what() << ".\n";
-      ts.ignore(ENDLINE);
-      continue;
+      catch (TokenError& e)
+      {
+        if (!skip)
+          std::cout << "TokenError: " << e.what << ".\n";
+        last = Token{ ENDLINE };
+        skip = true;
+      }
+      catch (VariableError& e)
+      {
+        if (!skip)
+          std::cout << "VariableError: " << e.what << ".\n";
+        last = Token{ ENDLINE };
+        skip = true;
+      }
+      catch (std::runtime_error& e)
+      {
+        if (!skip)
+          std::cout << "RunTimeError: " << e.what() << ".\n";
+        last = Token{ ENDLINE };
+        skip = true;
+      }
     }
   }
 }

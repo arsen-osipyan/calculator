@@ -14,14 +14,15 @@ Token TokenStream::get()
   }
 
   char ch;
-  while (true)
+  while (std::cin.good())
   {
     std::cin.get(ch);
-    if (std::cin.eof()) return Token{ QUIT };
-    if (ch == ENDLINE || !isspace(ch)) break;
+    std::cout << "'" << ch << "'\n";
     for (char c : ALLOWED) if (c == ch) break;
+    if (ch == ENDLINE || !isspace(ch)) break;
     if (!isspace(ch)) throw TokenError{ "bad token" };
   }
+  if (std::cin.eof()) return Token{ QUIT };
 
   switch (ch)
   {
@@ -83,15 +84,4 @@ Token TokenStream::get()
 void TokenStream::putback(Token t)
 {
   buffer.push_back(t);
-}
-
-void TokenStream::ignore(char break_char)
-{
-  buffer.clear();
-  while (true)
-  {
-    char ch;
-    std::cin.get(ch);
-    if (ch == break_char) return;
-  }
 }

@@ -54,7 +54,6 @@ class TokenStream
   public:
     Token get();
     void putback(Token t);
-    void ignore(char c);
 
     TokenStream()
       : buffer{ } { }
